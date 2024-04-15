@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Controllable Long Image Animation with Diffusion Models">
+  <meta name="keywords" content="image-to-video, diffusion models, controllable generation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Controllable Long Image Animation with Diffusion Models</title>
+  <style>
+    .item video {
+      width: 224; /* 视频宽度填满容器 */
+      height: 224; /* 高度自动调整以保持纵横比 */
+      object-fit: cover; /* 填充容器而不留空白，可能会裁剪视频的某些部分 */
+    }
+  </style>
+  <style>
+    .container_txt {
+        display: flex;
+        justify-content: center; /* 使元素之间等间距 */
+        width: 100%; /* 容器宽度可以根据需要调整 */
+    }
+    .container_txt span:not(:last-child) {
+        margin-right: 220px; /* 设置除最后一个span之外的span的右边距 */
+    }
+    .container_txt span:first-child {
+        margin-right: 220px; /* 设置第一个span（Input Image）的右边距更小 */
+      }        
+</style>
+  <style>
+    .video-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0px; /* 在视频组及其描述下方添加一些空间 */
+
+    }
+    
+    .video-row video {
+      width: calc(33% - 10px); /* 每个视频宽度为行宽的1/3, 减去间隙 */
+      height: 200px; /* 保持视频宽高比 */
+      object-fit: cover;
+    }
+  
+    .caption {
+      text-align: center;
+      margin-top: 5px; /* 描述文字与视频间距 */
+    }
+  </style>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Controllable Long Image Animation with Diffusion Models</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://keunhong.com">Wang Qiang</a>,</span>
+            <span class="author-block">
+              <a href="https://utkarshsinha.com">Minghua Luo</a>,</span>
+            <span class="author-block">
+              <a href="https://jonbarron.info">Junjun Hu</a>,
+            </span>
+            <span class="author-block">
+              <a href="http://sofienbouaziz.com">Fan Jiang</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.danbgoldman.com">xu mu</a>,
+            </span>
+          </div> 
+
+          <div class="is-size-5 publication-authors">
+            <!-- <span class="author-block"><sup>1</sup></span>
+            <span class="author-block"><sup>2</sup></span> -->
+            <span class="author-block">Alibaba Group</span> 
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://arxiv.org/pdf/2011.12948"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2011.12948"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+
+              <span class="link-block">
+                <a href="https://www.youtube.com/watch?v=MrKrnHhk8IA"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                </a>
+              </span>
+
+              <span class="link-block">
+                <a href="https://github.com/google/nerfies"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+               <!-- Dataset Link. -->
+              <span class="link-block">
+                <a href="https://github.com/google/nerfies/releases/tag/0.1"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="far fa-images"></i>
+                  </span>
+                  <span>Data</span>
+                  </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <video id="teaser" autoplay muted loop playsinline height="100%">
+        <source src="./static/head_video/scene_resize_converted.mp4"
+                type="video/mp4">
+      </video>
+      <video id="teaser" autoplay muted loop playsinline height="100%">
+        <source src="./static/head_video/water_resize_converted.mp4"
+                type="video/mp4">
+      </video>
+      <video id="teaser" autoplay muted loop playsinline height="100%">
+        <source src="./static/head_video/delay_time_resize_converted.mp4"
+                type="video/mp4">
+      </video>
+      <div class="container_txt">
+        <span>Input Image</span> <span>Motion Field</span><span>Animation</span>  
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+        <!-- <div class="item item-steve">
+          <video poster="" id="steve" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/motianlun/"
+                    type="video/mp4">
+          </video>
+        </div> -->
+        <div class="item item-steve">
+          <video poster="" id="steve" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/motianlun/2_converted_resize.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-blueshirt">
+          <video poster="" id="blueshirt" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/flower/924659425a4c3a5a51aaf6551fc25b91&operate=original_converted.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-toby">
+          <video poster="" id="toby" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/delay_time/0Biiwg6l4Mo_1_2_converted.mp4"
+                    type="video/mp4">
+          </video> 
+        </div>
+        <div class="item item-mask">
+          <video poster="" id="mask" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/flower/a-field-of-orange-flowers-and-green-leaves-in-the-woods-with-butterflies-and-other--SBV-347775309-4K_converted.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-fullbody">
+          <video poster="" id="fullbody" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/motianlun/7_converted_resize.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-chair-tp">
+          <video poster="" id="chair-tp" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/motianlun/3_converted_resize.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-shiba">
+          <video poster="" id="shiba" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/motianlun/5_converted_resize.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-coffee">
+          <video poster="" id="coffee" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/delay_time/0zp56mNGbIA_1_1_converted.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-toby">
+          <video poster="" id="toby" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/our_videos/delay_time/0rL1C3GJweo_1_4_converted.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Generating realistic animated videos from static images is an im-
+            portant area of research in computer vision. Methods based on
+            physical simulation and neural video generation have made signifi-
+            cant progress, but they are often limited to specific object textures
+            and motion trajectories, failing to exhibit highly complex environ-
+            ments and physical dynamics. In this paper, we introduce an open-
+            domain controllable image animation method using motion priors
+            with video diffusion models. Our method achieves precise control
+            over the direction and speed of motion in the movable region by
+            extracting the motion field information from videos and learning
+            moving trajectories and strengths. Current pretrained video gener-
+            ation models are typically limited to producing very short videos,
+            typically less than 30 frames. In contrast, we propose an efficient
+            long-duration video generation method based on noise reschedul-
+            ing specifically tailored for image animation tasks, facilitating the
+            creation of videos over 100 frames in length while maintaining
+            consistency in content scenery and motion coordination. Specifi-
+            cally, we decompose the denoise process into two distinct phases:
+            the shaping of scene contours and the refining of motion details.
+            Then we reschedule the noise to control the generated frame sequences maintaining long-distance noise correlation. We conducted
+            extensive experiments with 10 baselines, encompassing both com-mercial tools and academic methodologies, which demonstrate the
+            superiority of our method.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+    <!-- Paper video. -->
+    <!-- <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Video</h2>
+        <div class="publication-video">
+          <iframe src="https://www.youtube.com/embed/MrKrnHhk8IA?rel=0&amp;showinfo=0"
+                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div> -->
+    <!--/ Paper video. -->
+    
+  </div>
+</section>
+
+
+<section class="section">
+  
+ 
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <!-- <h2 class="title is-3">Animation</h2> -->
+        <!-- <h3 class="title is-4">Qualitative results.</h3> -->
+        <img src="./static/images/overview.jpg" alt="描述文字">
+        <!-- Interpolating. -->
+        <p>
+          <b>Overview of motion fields guidance:</b> <b>(a) Training stage:</b> We extract optical flow motion field and motion strength from
+training videos as conditional constraints. The motion field is enhanced through a spatio-temporal layer attention mechanism,
+while the motion intensity is projected into positional embeddings and concatenated with timestep embeddings.  <b>(b) Inference
+stage:</b> The control arrow provided by the user is initially transformed into a sparse motion field, and then convert to dense
+motion field by interpolation. Subsequently, the refined motion field is produced by employing a refinement model. The motion
+field, in conjunction with the input motion strength, regulates the video generation.
+        </p> 
+        
+      </div>
+    </div>
+    <h2 class="title is-3" >Animation results</h2>
+    <div class="columns is-centered">
+      
+      <!-- Visual Effects. -->
+      <!-- <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Visual Effects</h2>
+          <p>
+            Using <i>nerfies</i> you can create fun visual effects. This Dolly zoom effect
+            would be impossible without nerfies since it would require going through a wall.
+          </p>
+          <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/dollyzoom-stacked.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+      </div> -->
+      <!--/ Visual Effects. -->
+
+      <!-- Matting. -->
+    
+      <div class="column">
+        <div class="columns is-centered">
+          <div class="column content">
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/motianlun/2_converted_resize.mp4"
+                      type="video/mp4">
+            </video>
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/motianlun/3_converted_resize.mp4"
+                      type="video/mp4">
+            </video>
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/motianlun/5_converted_resize.mp4"
+                      type="video/mp4">
+            </video>
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/motianlun/7_converted_resize.mp4"
+                      type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      <!-- new -->
+      <div class="column">
+        <div class="columns is-centered">
+          <div class="column content">
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/delay_time/0zp56mNGbIA_1_1_converted.mp4"
+                      type="video/mp4">
+            </video>
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/delay_time/0rL1C3GJweo_1_4_converted.mp4"
+                      type="video/mp4">
+            </video>
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/delay_time/0Biiwg6l4Mo_1_2_converted.mp4"
+                      type="video/mp4">
+            </video>
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/delay_time/0zp56mNGbIA_12_0_converted.mp4"
+                      type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="columns is-centered">
+          <div class="column content">
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/flower/924659425a4c3a5a51aaf6551fc25b91&operate=original_converted.mp4"
+                      type="video/mp4">
+            </video>
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/flower/a-field-of-orange-flowers-and-green-leaves-in-the-woods-with-butterflies-and-other--SBV-347775309-4K_converted.mp4"
+                      type="video/mp4">
+            </video>
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/flower/8beda1d6689f350878dffe5ca61ba233_converted.mp4"
+                      type="video/mp4">
+            </video>
+            <video id="video" autoplay controls muted loop height="100%">
+              <source src="./static/our_videos/flower/a85e1a1eb15d0a1cf0941df37e1a4846_converted_resize.mp4"
+                      type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!--/ Matting. -->
+    
+    <!-- Animation. -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-4">Quantitative results. </h2>
+        <img src="./static/images/Qualitative_result.jpg" alt="描述文字">
+        <!-- Interpolating. -->
+        <h3 class="title is-4">Qualitative results between baselines and our approach</h3>
+        <div class="content has-text-justified">
+          <!-- <p >
+            animation ablation study
+          </p> -->
+        </div>
+
+
+        <div class="video-grid">
+          <div class="video-row">
+            <!-- 第一列 -->
+            <video src="./static/ablation_study/GEN2/00986_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/GEN2/00991_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/GEN2/00994_00000_gt_converted.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            GEN-2
+          </p>
+          <div class="video-row">
+            <!-- 第二列 -->
+            <video src="./static/ablation_study/pika/00986_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/pika/00991_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/pika/00994_00000_gt_converted.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            Pika Labs
+          </p>
+
+          <div class="video-row">
+            <!-- 第三列 -->
+            <video src="./static/ablation_study/SLR_SFS/00986_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/SLR_SFS/00991_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/SLR_SFS/00994_00000_gt_converted.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            SFS
+          </p>
+
+          <div class="video-row">
+            <!-- 第四列 -->
+            <video src="./static/ablation_study/animate_landscape/00986_00000_gt_converted_first25frames.mp4" controls></video>
+            <video src="./static/ablation_study/animate_landscape/00991_00000_gt_converted_first25frames.mp4" controls></video>
+            <video src="./static/ablation_study/animate_landscape/00994_00000_gt_converted_first25frames.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            Animating-landscape
+          </p>
+
+          <div class="video-row">
+            <!-- 第五列 -->
+            <video src="./static/ablation_study/ground_truth/00986_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/ground_truth/00991_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/ground_truth/00994_00000_gt_converted.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            Ground-truth
+          </p>
+
+
+          <div class="video-row">
+            <!-- 第六列 -->
+            <video src="./static/ablation_study/genmo/00986_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/genmo/00991_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/genmo/00994_00000_gt_converted.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            Genmo
+          </p>
+
+          <div class="video-row">
+            <!-- 第七列 -->
+            <video src="./static/ablation_study/i2vgen/00986_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/i2vgen/00991_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/i2vgen/00994_00000_gt_converted.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            I2VGen-XL
+          </p>
+
+          <div class="video-row">
+            <!-- 第八列 -->
+            <video src="./static/ablation_study/modified_holynski_baseline_GT/00986_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/modified_holynski_baseline_GT/00991_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/modified_holynski_baseline_GT/00994_00000_gt_converted.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            Animating-pictures
+          </p>
+
+          <div class="video-row">
+            <!-- 第九列 -->
+            <video src="./static/ablation_study/anymate-anything-8/00986_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/anymate-anything-8/00991_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/anymate-anything-8/00994_00000_gt_converted.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            Animate-anything
+          </p>
+
+          <div class="video-row">
+            <!-- 第十列 -->
+            <video src="./static/ablation_study/water_8100/00986_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/water_8100/00991_00000_gt_converted.mp4" controls></video>
+            <video src="./static/ablation_study/water_8100/00994_00000_gt_converted.mp4" controls></video>
+          </div>
+          <p style="text-align: center; margin-top: 0px; margin-bottom: 20px;">
+            Ours
+          </p>
+
+        </div>
+
+        
+
+
+
+
+
+        
+
+        <br/>
+        <!--/ Interpolating. -->
+
+        <!-- Re-rendering. -->
+        <h3 class="title is-4">Longer Video Generation</h3>
+        <div class="content has-text-justified">
+          <!-- <p>
+            Using <span class="dnerf">Nerfies</span>, you can re-render a video from a novel
+            viewpoint such as a stabilized camera by playing back the training deformations.
+          </p> -->
+
+        <section class="hero teaser">
+          <div class=" is-centered container is-max-desktop">
+            <div class="has-text-centered">
+              <video id="longvideo1" autoplay muted loop playsinline controls>
+                <source src="./static/long_video/14_ours_converted_resize.mp4"
+                        type="video/mp4">
+              </video>
+              <video id="longvideo2" autoplay muted loop playsinline controls>
+                <source src="./static/long_video/16_ours_converted_resize.mp4"
+                        type="video/mp4">
+              </video>
+              <video id="longvideo3" autoplay muted loop playsinline controls>
+                <source src="./static/long_video/no_skip80_1_converted_resize.mp4"
+                        type="video/mp4">
+              </video>
+              <!-- <h2 class="subtitle has-text-centered">
+                <span class="dnerf">Nerfies</span> turns selfie videos from your phone into
+                free-viewpoint
+                portraits.
+              </h2> -->
+            </div>
+          </div>
+        </section>
+        </div>
+        <!--/ Re-rendering. -->
+
+      </div>
+    </div>
+    <!--/ Animation. -->
+
+
+    <!--/ Concurrent Work. -->
+
+  </div>
+</section>
+
+<section class="section" id="Contact">
+  <div class="container is-max-desktop content">
+    <h2 class="title">Contact</h2>
+    <p>if you have any questions, please contact yijing.wq@alibaba-inc.com or luominghua.lmh@alibaba-inc.com</p>
+  </div>
+</section>
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{park2021nerfies,
+  author    = {Park, Keunhong and Sinha, Utkarsh and Barron, Jonathan T. and Bouaziz, Sofien and Goldman, Dan B and Seitz, Steven M. and Martin-Brualla, Ricardo},
+  title     = {Nerfies: Deformable Neural Radiance Fields},
+  journal   = {ICCV},
+  year      = {2021},
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <!-- <a class="icon-link"
+         href="./static/videos/nerfies_paper.pdf">
+        <i class="fas fa-file-pdf"></i>
+      </a> -->
+      <!-- <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a> -->
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is borrowed from <a
+              href="https://github.com/nerfies/nerfies.github.io">source code</a> 
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
