@@ -280,24 +280,18 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Generating realistic animated videos from static images is an im-
-            portant area of research in computer vision. Methods based on
-            physical simulation and neural video generation have made signifi-
-            cant progress, but they are often limited to specific object textures
-            and motion trajectories, failing to exhibit highly complex environ-
-            ments and physical dynamics. In this paper, we introduce an open-
+            Generating realistic animated videos from static images is an important area of research in computer vision. Methods based on
+            physical simulation and neural video generation have made significant progress, but they are often limited to specific object textures
+            and motion trajectories, failing to exhibit highly complex environments and physical dynamics. In this paper, we introduce an open-
             domain controllable image animation method using motion priors
             with video diffusion models. Our method achieves precise control
             over the direction and speed of motion in the movable region by
             extracting the motion field information from videos and learning
-            moving trajectories and strengths. Current pretrained video gener-
-            ation models are typically limited to producing very short videos,
+            moving trajectories and strengths. Current pretrained video generation models are typically limited to producing very short videos,
             typically less than 30 frames. In contrast, we propose an efficient
-            long-duration video generation method based on noise reschedul-
-            ing specifically tailored for image animation tasks, facilitating the
+            long-duration video generation method based on noise rescheduling specifically tailored for image animation tasks, facilitating the
             creation of videos over 100 frames in length while maintaining
-            consistency in content scenery and motion coordination. Specifi-
-            cally, we decompose the denoise process into two distinct phases:
+            consistency in content scenery and motion coordination. Specifically, we decompose the denoise process into two distinct phases:
             the shaping of scene contours and the refining of motion details.
             Then we reschedule the noise to control the generated frame sequences maintaining long-distance noise correlation. We conducted
             extensive experiments with 10 baselines, encompassing both com-mercial tools and academic methodologies, which demonstrate the
